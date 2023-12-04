@@ -178,16 +178,18 @@ const Provider = ({
     },
     onSuccess(num) {
       toast({
-        title: `共成功导入 ${num} 组数据，请耐心等待训练.`,
+        title: t('core.dataset.import.Import Success Tip', { num }),
         status: 'success'
       });
       onUploadSuccess();
     },
-    errorToast: '导入文件失败'
+    errorToast: t('core.dataset.import.Import Failed')
   });
 
   const onReSplitChunks = useCallback(async () => {
     try {
+      setPreviewFile(undefined);
+
       setFiles((state) =>
         state.map((file) => {
           const splitRes = splitText2Chunks({
@@ -210,10 +212,10 @@ const Provider = ({
     } catch (error) {
       toast({
         status: 'warning',
-        title: getErrText(error, '文本分段异常')
+        title: getErrText(error, t('core.dataset.import.Set Chunk Error'))
       });
     }
-  }, [chunkLen, toast]);
+  }, [chunkLen, chunkOverlapRatio, t, toast]);
 
   const reset = useCallback(() => {
     setFiles([]);
@@ -253,6 +255,7 @@ export default React.memo(Provider);
 
 export const PreviewFileOrChunk = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { setFiles, previewFile, setPreviewFile, setReShowRePreview, totalChunks, files } =
     useImportStore();
 
@@ -310,11 +313,11 @@ export const PreviewFileOrChunk = () => {
         <Box pt={[3, 6]}>
           <Flex px={[4, 8]} alignItems={'center'}>
             <Box fontSize={['lg', 'xl']} fontWeight={'bold'}>
-              分段预览({totalChunks}组)
+              {t('core.dataset.import.Total Chunk Preview', { totalChunks })}
             </Box>
             {totalChunks > 50 && (
               <Box ml={2} fontSize={'sm'} color={'myhGray.500'}>
-                仅展示部分
+                {t('core.dataset.import.Only Show First 50 Chunk')}
               </Box>
             )}
           </Flex>
@@ -490,6 +493,7 @@ export const SelectorContainer = ({
                 display={['block', 'none']}
                 onClick={(e) => {
                   e.stopPropagation();
+                  setPreviewFile(undefined);
                   setFiles((state) => state.filter((file) => file.id !== item.id));
                 }}
               />

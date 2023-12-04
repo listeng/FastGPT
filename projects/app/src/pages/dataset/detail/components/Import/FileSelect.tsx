@@ -18,13 +18,13 @@ import { useTranslation } from 'next-i18next';
 import { customAlphabet } from 'nanoid';
 import dynamic from 'next/dynamic';
 import MyTooltip from '@/components/MyTooltip';
-import type { FetchResultItem } from '@fastgpt/global/common/plugin/types/pluginRes.d';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import { useDatasetStore } from '@/web/core/dataset/store/dataset';
 import { getFileIcon } from '@fastgpt/global/common/file/icon';
 import { countPromptTokens } from '@fastgpt/global/common/string/tiktoken';
 import { DatasetCollectionTypeEnum } from '@fastgpt/global/core/dataset/constant';
 import type { PushDatasetDataChunkProps } from '@fastgpt/global/core/dataset/api.d';
+import { UrlFetchResponse } from '@fastgpt/global/common/file/api.d';
 
 const UrlFetchModal = dynamic(() => import('./UrlFetchModal'));
 const CreateFileModal = dynamic(() => import('./CreateFileModal'));
@@ -137,7 +137,7 @@ const FileSelect = ({
           if (extension === 'csv') {
             const { header, data } = await readCsvContent(file);
             if (header[0] !== 'index' || header[1] !== 'content') {
-              throw new Error('csv 文件格式有误,请确保 index 和 content 两列');
+              throw new Error(t('core.dataset.import.Csv format error'));
             }
 
             const filterData = data
@@ -205,7 +205,7 @@ const FileSelect = ({
       } catch (error: any) {
         console.log(error);
         toast({
-          title: getErrText(error, '解析文件失败'),
+          title: getErrText(error, t('common.file.Read File Error')),
           status: 'error'
         });
       }
@@ -215,7 +215,7 @@ const FileSelect = ({
   );
   // link fetch
   const onUrlFetch = useCallback(
-    (e: FetchResultItem[]) => {
+    (e: UrlFetchResponse) => {
       const result: FileItemType[] = e.map<FileItemType>(({ url, content }) => {
         const splitRes = splitText2Chunks({
           text: content,
