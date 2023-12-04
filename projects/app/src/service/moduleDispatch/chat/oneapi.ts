@@ -51,7 +51,7 @@ export const dispatchChatCompletion = async (props: ChatProps): Promise<ChatResp
       maxToken = 4000,
       history = [],
       quoteQA = [],
-      quoteShow = false,
+      quoteShow = undefined,
       userChatInput,
       isResponseAnswerText = true,
       systemPrompt = '',
@@ -61,6 +61,10 @@ export const dispatchChatCompletion = async (props: ChatProps): Promise<ChatResp
   } = props;
   if (!userChatInput) {
     return Promise.reject('Question is empty');
+  }
+
+  if (quoteShow == undefined) {
+    quoteShow = true;
   }
 
   stream = stream && isResponseAnswerText;
